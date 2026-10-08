@@ -25,7 +25,5 @@
     <string name="label_none">強制なし</string>
     <string name="result_changed">変更しました: %1$s → %2$s</string>
     <string name="result_failed">失敗しました</string>
-    <string name="result_unchanged">変更なし</string>
     <string name="result_already_none">すでに強制なしなので、何も変わりません。それでもマナーモードでシャッター音が鳴るなら、カメラアプリ自身が鳴らしているため、このアプリでは止められません。</string>
-    <string name="result_already_enforced">すでに強制されているので、何も変わりません。</string>
 </resources>

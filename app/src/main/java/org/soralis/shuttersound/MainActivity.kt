@@ -72,27 +72,17 @@ class MainActivity : Activity() {
     private fun apply(config: Int) {
         if (busy) return
         val before = current
-        if (before == config) {
-            // Nothing to change, which is what a device that does not enforce
-            // the sound through the audio policy looks like.
-            toast(getString(R.string.result_unchanged))
-            messageText.setText(
-                if (config == ForceUse.FORCE_NONE) R.string.result_already_none
-                else R.string.result_already_enforced
-            )
-            return
-        }
+        errorText.text = ""
         setBusy(true)
         ShutterSound.set(this, config) { result ->
             setBusy(false)
-            messageText.text = ""
             result.onSuccess {
                 Log.i(TAG, "FOR_SYSTEM $before -> $config")
                 toast(getString(R.string.result_changed, label(before), label(config)))
             }.onFailure { e ->
                 Log.e(TAG, "Could not set FOR_SYSTEM to $config", e)
                 toast(getString(R.string.result_failed))
-                messageText.text = e.message ?: e.toString()
+                errorText.text = e.message ?: e.toString()
             }
             // Read it back rather than trusting the call.
             refresh()
@@ -102,9 +92,20 @@ class MainActivity : Activity() {
     private fun setBusy(value: Boolean) {
         busy = value
         if (value) currentText.setText(R.string.current_working)
-        val ready = !value && ShutterSound.status() == ShutterSound.Status.READY
-        release.isEnabled = ready
-        restore.isEnabled = ready
+        updateButtons()
+    }
+
+    /** Only offer what would change something, so a press always does. */
+    private fun updateButtons() {
+        val ready = !busy && ShutterSound.status() == ShutterSound.Status.READY
+        val config = current
+        release.isEnabled = ready && config != null && config != ShutterTileService.released()
+        restore.isEnabled = ready && config != null && config != ForceUse.deviceDefault()
+        // Nothing to lift: the device leaves the shutter to the camera app.
+        messageText.text =
+            if (!busy && config == ForceUse.FORCE_NONE && ForceUse.deviceDefault() == ForceUse.FORCE_NONE)
+                getString(R.string.result_already_none)
+            else ""
     }
 
     private fun label(config: Int?): String = when (config) {
@@ -128,14 +129,13 @@ class MainActivity : Activity() {
             }
         )
         authorize.isEnabled = status == ShutterSound.Status.NOT_AUTHORIZED
-        release.isEnabled = !busy && status == ShutterSound.Status.READY
-        restore.isEnabled = !busy && status == ShutterSound.Status.READY
         if (status == ShutterSound.Status.READY) {
             ShutterSound.query(this, ::show)
         } else {
             current = null
             currentText.setText(R.string.current_unknown)
             errorText.text = ""
+            updateButtons()
         }
     }
 
@@ -150,12 +150,13 @@ class MainActivity : Activity() {
                     else -> R.string.current_unknown
                 }
             ) + " (FOR_SYSTEM=$config)"
-            errorText.text = ""
+            updateButtons()
         }.onFailure { e ->
             Log.e(TAG, "Could not read FOR_SYSTEM", e)
             current = null
             currentText.setText(R.string.current_unknown)
             errorText.text = e.message ?: e.toString()
+            updateButtons()
         }
     }
 

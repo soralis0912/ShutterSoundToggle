@@ -25,7 +25,5 @@
     <string name="label_none">not enforced</string>
     <string name="result_changed">Changed: %1$s → %2$s</string>
     <string name="result_failed">Failed</string>
-    <string name="result_unchanged">Nothing to change</string>
     <string name="result_already_none">Already not enforced, so nothing changed. If the shutter still sounds in silent mode, the camera app plays it by itself and this app cannot stop it.</string>
-    <string name="result_already_enforced">Already enforced, so nothing changed.</string>
 </resources>
