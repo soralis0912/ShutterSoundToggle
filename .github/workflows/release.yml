@@ -1,0 +1,92 @@
+name: Release
+
+# Tag to release:
+#
+#   git tag v1.0 && git push origin v1.0
+#
+# The tag without its leading "v" becomes versionName.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # The signature is what decides whether an existing install can be
+      # updated, so a release that is not signed with this key is worse than no
+      # release. Fail rather than fall back to the debug or test key.
+      - name: Restore the signing key
+        env:
+          STORE_FILE_BASE64: ${{ secrets.STORE_FILE }}
+        run: |
+          set -euo pipefail
+          if [ -z "${STORE_FILE_BASE64:-}" ]; then
+            echo "::error::no STORE_FILE secret"
+            exit 1
+          fi
+          printf '%s' "$STORE_FILE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+
+      - name: Build
+        env:
+          STORE_FILE: ${{ runner.temp }}/release.jks
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE}" = tag ]; then export VERSION_NAME="${TAG#v}"; fi
+          ./gradlew --no-daemon assembleRelease
+
+      # The release key exists only in the secrets, and this is its
+      # fingerprint; checking it catches the secret having been replaced with
+      # a different key, which would publish an update nothing can install
+      # over.
+      - name: Check the signature
+        run: |
+          set -euo pipefail
+          apk=app/build/outputs/apk/release/app-release.apk
+          [ -f "$apk" ] || { echo "::error::gradle produced no $apk"; exit 1; }
+          apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs "$apk" | tee certs.txt
+          expected=5B0635F4A2AC4FBF29E1AB5134B7A456843DB4936A5BCB649A1FD91182BEEBD4
+          got=$(sed -n 's/.*SHA-256 digest: //p' certs.txt | head -1 | tr -d ' :' | tr 'a-f' 'A-F')
+          if [ "$got" != "$expected" ]; then
+            echo "::error::signed with the wrong key. Expected $expected, got $got"
+            exit 1
+          fi
+          mkdir -p out
+          cp "$apk" "out/ShutterSoundToggle-${GITHUB_REF_NAME}.apk"
+
+      - name: Release
+        if: github.ref_type == 'tag'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: ShutterSoundToggle ${{ github.ref_name }}
+          artifacts: out/*.apk
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload (manual run)
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShutterSoundToggle-release-${{ github.sha }}
+          path: out/*.apk
+          if-no-files-found: error

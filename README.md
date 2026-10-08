@@ -47,10 +47,29 @@ Nothing device specific is involved; this is the AOSP audio policy.
 ## Build
 
 ```sh
-./gradlew assembleDebug
+./gradlew assembleRelease
 ```
 
 Requires Android 13 (API 33) or later.
+
+The keystore comes from `STORE_FILE`, `STORE_PASSWORD`, `KEY_ALIAS` and
+`KEY_PASSWORD` in the environment; a local build without them is signed with
+the debug key.
+
+| Workflow | Trigger | Key |
+|---|---|---|
+| `ci.yml` | every push / pull request | `testkey.jks` (public AOSP test key), fingerprint checked |
+| `release.yml` | tag `v*` | release key from Actions secrets, fingerprint checked |
+
+```sh
+git tag v1.0 && git push origin v1.0
+```
+
+A test-signed APK and a release-signed one cannot update each other; switching
+between them means uninstalling first.
+
+Release signing certificate SHA-256:
+`5B:06:35:F4:A2:AC:4F:BF:29:E1:AB:51:34:B7:A4:56:84:3D:B4:93:6A:5B:CB:64:9A:1F:D9:11:82:BE:EB:D4`
 
 ## License
 

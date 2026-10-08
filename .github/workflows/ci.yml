@@ -19,10 +19,41 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      # testkey.jks is the public AOSP test key, so this needs no secret and
+      # runs on a pull request from a fork the same as on main. Signed rather
+      # than unsigned because an unsigned apk cannot be installed at all.
       - name: Build
-        run: ./gradlew --no-daemon assembleDebug
+        env:
+          STORE_FILE: ${{ github.workspace }}/testkey.jks
+          STORE_PASSWORD: android
+          KEY_ALIAS: android
+          KEY_PASSWORD: android
+        run: ./gradlew --no-daemon assembleRelease
+
+      # Whatever a future edit does to the env above, what CI publishes must
+      # never be signed with the release key.
+      - name: Check the signature
+        run: |
+          set -euo pipefail
+          apk=app/build/outputs/apk/release/app-release.apk
+          [ -f "$apk" ] || { echo "::error::gradle produced no $apk"; exit 1; }
+          apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs "$apk" | tee certs.txt
+          testkey=A40DA80A59D170CAA950CF15C18C454D47A39B26989D8B640ECD745BA71BF5DC
+          got=$(sed -n 's/.*SHA-256 digest: //p' certs.txt | head -1 | tr -d ' :' | tr 'a-f' 'A-F')
+          if [ "$got" != "$testkey" ]; then
+            echo "::error::not signed with testkey.jks. Expected $testkey, got $got"
+            exit 1
+          fi
+          mkdir -p out
+          cp "$apk" "out/ShutterSoundToggle-testkey-${GITHUB_SHA::7}.apk"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ShutterSoundToggle-debug-${{ github.sha }}
-          path: app/build/outputs/apk/debug/app-debug.apk
+          # The name says which key it is because a test-signed build and a
+          # release-signed one cannot replace each other: installing this and
+          # then a release means uninstalling the app in between.
+          name: ShutterSoundToggle-testkey-${{ github.sha }}
+          path: out/*.apk
+          if-no-files-found: error
+          retention-days: 30

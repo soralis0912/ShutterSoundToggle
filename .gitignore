@@ -6,4 +6,5 @@ local.properties
 *.iml
 .kotlin/
 *.jks
+!testkey.jks
 *.keystore
