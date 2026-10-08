@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shutter Sound Toggle</string>
+    <string name="tile_label">Shutter sound</string>
+    <string name="about">Devices sold in some regions force the camera shutter sound to play even in silent mode. This app uses Shizuku to switch that enforcement (AudioSystem FOR_SYSTEM) off and back on.</string>
+    <string name="caveats">The change lives in audioserver only: a reboot or an audioserver restart puts the device default back, and nothing else does. Uninstalling the app does not undo it, so restore before removing the app.\n\nWith the enforcement off, the shutter follows the ringer mode: it is silenced in silent or vibrate mode only. Other sounds that use the enforced stream are affected the same way.\n\nRespect the privacy of the people around you and the rules where you live.</string>
+    <string name="shizuku_not_running">Shizuku: not running</string>
+    <string name="shizuku_not_authorized">Shizuku: permission not granted</string>
+    <string name="shizuku_ready">Shizuku: ready</string>
+    <string name="device_forced">Device default: shutter sound enforced</string>
+    <string name="device_not_forced">Device default: not enforced</string>
+    <string name="current_enforced">Now: enforced</string>
+    <string name="current_none">Now: not enforced (follows the ringer mode)</string>
+    <string name="current_unknown">Now: unknown</string>
+    <string name="action_authorize">Grant Shizuku permission</string>
+    <string name="action_release">Stop enforcing the shutter sound</string>
+    <string name="action_restore">Restore the device default</string>
+    <string name="action_refresh">Check again</string>
+    <string name="notification_channel">Changed sound settings</string>
+    <string name="notification_title">Shutter sound enforcement changed</string>
+    <string name="notification_changed">The device default comes back on reboot. Restore it before uninstalling.</string>
+    <string name="notification_restore_failed">Could not restore: Shizuku may be stopped. Start it and restore from the app, or reboot.</string>
+</resources>

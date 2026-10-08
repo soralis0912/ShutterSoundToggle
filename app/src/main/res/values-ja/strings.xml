@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">シャッター音トグル</string>
+    <string name="tile_label">シャッター音</string>
+    <string name="about">日本向けなど一部の端末は、マナーモードでもカメラのシャッター音が鳴るよう強制されています。このアプリは Shizuku を使って、その強制（AudioSystem の FOR_SYSTEM）を解除したり戻したりします。</string>
+    <string name="caveats">変更は audioserver のメモリ上だけです。端末の再起動か audioserver の再起動で端末の既定値に戻り、それ以外では戻りません。アプリを削除しても元に戻らないので、削除する前に「既定値に戻す」を実行してください。\n\n強制を解除すると、シャッター音は着信音モードに従います。消えるのはサイレント／バイブのときだけです。同じ強制ストリームを使う他の音も同様に影響を受けます。\n\n周囲の人のプライバシーと、お住まいの地域のルールを守って使ってください。</string>
+    <string name="shizuku_not_running">Shizuku: 起動していません</string>
+    <string name="shizuku_not_authorized">Shizuku: 権限が許可されていません</string>
+    <string name="shizuku_ready">Shizuku: 準備完了</string>
+    <string name="device_forced">端末の既定値: シャッター音を強制</string>
+    <string name="device_not_forced">端末の既定値: 強制しない</string>
+    <string name="current_enforced">現在: 強制</string>
+    <string name="current_none">現在: 強制なし（着信音モードに従う）</string>
+    <string name="current_unknown">現在: 不明</string>
+    <string name="action_authorize">Shizuku の権限を許可</string>
+    <string name="action_release">シャッター音の強制を解除</string>
+    <string name="action_restore">端末の既定値に戻す</string>
+    <string name="action_refresh">再確認</string>
+    <string name="notification_channel">変更中の音設定</string>
+    <string name="notification_title">シャッター音の強制を変更中</string>
+    <string name="notification_changed">再起動すると端末の既定値に戻ります。アプリを削除する前に戻してください。</string>
+    <string name="notification_restore_failed">戻せませんでした。Shizuku が停止している可能性があります。Shizuku を起動してアプリから戻すか、再起動してください。</string>
+</resources>
