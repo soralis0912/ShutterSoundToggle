@@ -20,4 +20,12 @@
     <string name="notification_title">Shutter sound enforcement changed</string>
     <string name="notification_changed">The device default comes back on reboot. Restore it before uninstalling.</string>
     <string name="notification_restore_failed">Could not restore: Shizuku may be stopped. Start it and restore from the app, or reboot.</string>
+    <string name="current_working">Now: working…</string>
+    <string name="label_enforced">enforced</string>
+    <string name="label_none">not enforced</string>
+    <string name="result_changed">Changed: %1$s → %2$s</string>
+    <string name="result_failed">Failed</string>
+    <string name="result_unchanged">Nothing to change</string>
+    <string name="result_already_none">Already not enforced, so nothing changed. If the shutter still sounds in silent mode, the camera app plays it by itself and this app cannot stop it.</string>
+    <string name="result_already_enforced">Already enforced, so nothing changed.</string>
 </resources>

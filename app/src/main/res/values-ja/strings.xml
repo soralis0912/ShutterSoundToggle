@@ -20,4 +20,12 @@
     <string name="notification_title">シャッター音の強制を変更中</string>
     <string name="notification_changed">再起動すると端末の既定値に戻ります。アプリを削除する前に戻してください。</string>
     <string name="notification_restore_failed">戻せませんでした。Shizuku が停止している可能性があります。Shizuku を起動してアプリから戻すか、再起動してください。</string>
+    <string name="current_working">現在: 処理中…</string>
+    <string name="label_enforced">強制</string>
+    <string name="label_none">強制なし</string>
+    <string name="result_changed">変更しました: %1$s → %2$s</string>
+    <string name="result_failed">失敗しました</string>
+    <string name="result_unchanged">変更なし</string>
+    <string name="result_already_none">すでに強制なしなので、何も変わりません。それでもマナーモードでシャッター音が鳴るなら、カメラアプリ自身が鳴らしているため、このアプリでは止められません。</string>
+    <string name="result_already_enforced">すでに強制されているので、何も変わりません。</string>
 </resources>
